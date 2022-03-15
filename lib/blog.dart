@@ -350,6 +350,7 @@ class _BlogState extends State<Blog> {
                             icon: Icon(
                               Icons.delete,
                             ),
+                            
                           ),
                         ),
                       );
