@@ -2,8 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
+import 'package:newblog/blog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Login extends StatefulWidget {
@@ -16,7 +19,9 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  final String login_url = 'http://10.0.2.2:7000/login';
+  final url = dotenv.env['SERVER_URL']! + '/login';
+  final formKey = GlobalKey<FormState>();
+  // final String login_url = 'http://10.0.2.2:7000/login';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,32 +67,46 @@ class _LoginState extends State<Login> {
   }
 
   Future<void> login() async {
+    // validate data
+    if (!formKey.currentState!.validate()) {
+      return;
+    }
+    // show waiting dialog
+    Get.defaultDialog(
+      title: 'Connecting...',
+      content: const CircularProgressIndicator(),
+      barrierDismissible: false,
+    );
+
     final username = usernameController.text;
     final password = passwordController.text;
     // if (kDebugMode) {
     //   print(username + password);
     // }
-    http.Response response = await http.post(
-      Uri.parse(login_url),
-      body: {'username': username, 'password': password},
-    );
-    
-    if (response.statusCode == 200) {
-      //?==== Login Pass ====?
-      var result = jsonDecode(response.body);
+    Response response = await GetConnect(timeout: const Duration(seconds: 5))
+        .post(url, {'username': username, 'password': password});
+    if (response.isOk) {
+      // close spinner
+      Get.back();
+      var result = response.body;
+      // login OK
       String token = result['token'];
-      //ptint the result
-      //print(result);
-      //save token to local storage
-      final prefs = await SharedPreferences.getInstance();
-      prefs.setString('token', token);
-      //jumppppppp
-      Get.offNamed('/blog');
+      // save token to local storage
+      const storage = FlutterSecureStorage();
+      storage.write(key: 'token', value: token);
+
+      // jump to blog
+     Get.off(() => Blog(username));
+     //Get.offNamed('/blog');
     } else {
-      //!==== Login Failed ====!
+      // close spinner
+      Get.back();
+      // login failed
       Get.defaultDialog(
         title: 'Error',
-        middleText: response.body.toString(),
+        middleText: response.statusCode == null
+            ? 'Connection timeout, try again!'
+            : response.body.toString(),
       );
     }
 
