@@ -28,38 +28,53 @@ class _LoginState extends State<Login> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Sign in'),
-              SizedBox(
-                height: 16,
-              ),
-              TextField(
-                controller: usernameController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Username',
+          child: Form(
+            key: formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Sign in'),
+                SizedBox(
+                  height: 16,
                 ),
-              ),
-              SizedBox(
-                height: 16,
-              ),
-              TextField(
-                controller: passwordController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Password',
+                TextFormField(
+                  controller: usernameController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Username',
+                  ),
+                  validator: (value) {
+                    // rule
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Please enter the username';
+                    }
+                  },
                 ),
-              ),
-              SizedBox(
-                height: 16,
-              ),
-              OutlineButton(
-                onPressed: login,
-                child: Text('Sign in'),
-              ),
-            ],
+                SizedBox(
+                  height: 16,
+                ),
+                TextFormField(
+                  controller: passwordController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Password',
+                  ),
+                  validator: (value) {
+                    // rule
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Please enter the password';
+                    }
+                  },
+                ),
+                SizedBox(
+                  height: 16,
+                ),
+                OutlineButton(
+                  onPressed: login,
+                  child: Text('Sign in'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -96,8 +111,8 @@ class _LoginState extends State<Login> {
       storage.write(key: 'token', value: token);
 
       // jump to blog
-     Get.off(() => Blog(username));
-     //Get.offNamed('/blog');
+      Get.off(() => Blog(username));
+      //Get.offNamed('/blog');
     } else {
       // close spinner
       Get.back();

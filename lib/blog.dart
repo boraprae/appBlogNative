@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
+import 'package:newblog/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Blog extends StatefulWidget {
-  String? username;
-  Blog( this.username ,{Key? key}): super(key: key);
+  final String username;
+  Blog(this.username, {Key? key}) : super(key: key);
 
   @override
   _BlogState createState() => _BlogState();
@@ -12,24 +15,35 @@ class Blog extends StatefulWidget {
 
 class _BlogState extends State<Blog> {
   //*=========== Data Set ==============
-  List data = [
-    {'title': 'First', 'detail': 'aaa'},
-    {'title': 'Second', 'detail': 'bbb'},
-    {'title': 'Third', 'detail': 'ccc'},
-  ];
+  // List data = [
+  //   {'title': 'First', 'detail': 'aaa'},
+  //   {'title': 'Second', 'detail': 'bbb'},
+  //   {'title': 'Third', 'detail': 'ccc'},
+  // ];
   TextEditingController titleController = TextEditingController();
   TextEditingController detailController = TextEditingController();
   final maxLines = 5;
-  final String _url = 'http://10.0.2.2:7000/mobile/blog';
+  final String _url = dotenv.env['SERVER_URL']! + '/mobile/blogs';
   late Future<List> _data;
 
   Future<List> getData() async {
-    Response response = await GetConnect().get(_url);
+    // get token from local storage and verify with server
+    const storage = FlutterSecureStorage();
+    String token = await storage.read(key: 'token') ?? '';
+
+    Response response =
+        await GetConnect().get(_url, headers: {'authorization': token});
     if (response.status.isOk) {
       return response.body;
     } else {
       throw Exception('Error');
     }
+    // Response response = await GetConnect().get(_url);
+    // if (response.status.isOk) {
+    //   return response.body;
+    // } else {
+    //   throw Exception('Error');
+    // }
   }
 
   @override
@@ -39,120 +53,120 @@ class _BlogState extends State<Blog> {
   }
 
   //?########### Dialog for edit card ###############
-  Future showEditDialog(index) async {
-    await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            content: Container(
-              width: MediaQuery.of(context).size.width - 3,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.library_add,
-                          color: Colors.black,
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Text(
-                          'Edit ' +
-                              '\"' +
-                              data[index]['title'] +
-                              "\"" +
-                              ' BLOG',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    height: 80,
-                    child: TextField(
-                      controller: titleController,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        helperText: 'Enter a title',
-                        hintText: data[index]['title'],
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 8, 0, 16),
-                    child: Container(
-                      height: maxLines * 24.0,
-                      child: TextField(
-                        maxLines: maxLines,
-                        controller: detailController,
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            helperText: 'Enter a details',
-                            hintText: data[index]['detail']),
-                      ),
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Colors.black,
-                        ),
-                        child: Text(
-                          'Cancel',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Colors.limeAccent,
-                        ),
-                        onPressed: () {
-                          updateToDataSet(titleController.text,
-                              detailController.text, index);
-                        },
-                        child: Text(
-                          'Edit',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          );
-        });
-  }
+  // Future showEditDialog(index) async {
+  //   await showDialog(
+  //       context: context,
+  //       builder: (BuildContext context) {
+  //         return AlertDialog(
+  //           content: Container(
+  //             width: MediaQuery.of(context).size.width - 3,
+  //             child: Column(
+  //               mainAxisSize: MainAxisSize.min,
+  //               children: [
+  //                 Padding(
+  //                   padding: const EdgeInsets.all(16.0),
+  //                   child: Row(
+  //                     children: [
+  //                       Icon(
+  //                         Icons.library_add,
+  //                         color: Colors.black,
+  //                       ),
+  //                       SizedBox(
+  //                         width: 5,
+  //                       ),
+  //                       Text(
+  //                         'Edit ' +
+  //                             '\"' +
+  //                             data[index]['title'] +
+  //                             "\"" +
+  //                             ' BLOG',
+  //                         style: TextStyle(
+  //                           fontSize: 16,
+  //                           fontWeight: FontWeight.bold,
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //                 Container(
+  //                   height: 80,
+  //                   child: TextField(
+  //                     controller: titleController,
+  //                     decoration: InputDecoration(
+  //                       border: OutlineInputBorder(),
+  //                       helperText: 'Enter a title',
+  //                       hintText: data[index]['title'],
+  //                     ),
+  //                   ),
+  //                 ),
+  //                 Padding(
+  //                   padding: const EdgeInsets.fromLTRB(0, 8, 0, 16),
+  //                   child: Container(
+  //                     height: maxLines * 24.0,
+  //                     child: TextField(
+  //                       maxLines: maxLines,
+  //                       controller: detailController,
+  //                       decoration: InputDecoration(
+  //                           border: OutlineInputBorder(),
+  //                           helperText: 'Enter a details',
+  //                           hintText: data[index]['detail']),
+  //                     ),
+  //                   ),
+  //                 ),
+  //                 Row(
+  //                   mainAxisAlignment: MainAxisAlignment.end,
+  //                   children: [
+  //                     ElevatedButton(
+  //                       style: ElevatedButton.styleFrom(
+  //                         primary: Colors.black,
+  //                       ),
+  //                       child: Text(
+  //                         'Cancel',
+  //                         style: TextStyle(
+  //                           fontWeight: FontWeight.bold,
+  //                         ),
+  //                       ),
+  //                       onPressed: () {
+  //                         Navigator.of(context).pop();
+  //                       },
+  //                     ),
+  //                     SizedBox(
+  //                       width: 5,
+  //                     ),
+  //                     ElevatedButton(
+  //                       style: ElevatedButton.styleFrom(
+  //                         primary: Colors.limeAccent,
+  //                       ),
+  //                       onPressed: () {
+  //                         updateToDataSet(titleController.text,
+  //                             detailController.text, index);
+  //                       },
+  //                       child: Text(
+  //                         'Edit',
+  //                         style: TextStyle(
+  //                           fontWeight: FontWeight.bold,
+  //                           color: Colors.black,
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         );
+  //       });
+  // }
 
   //*########### Edit new data from user #############
-  void updateToDataSet(String title, String detail, index) {
-    setState(() {
-      data[index] = {"title": title, "detail": detail};
-      titleController.clear();
-      detailController.clear();
-      Navigator.of(context).pop();
-    });
-  }
+  // void updateToDataSet(String title, String detail, index) {
+  //   setState(() {
+  //     data[index] = {"title": title, "detail": detail};
+  //     titleController.clear();
+  //     detailController.clear();
+  //     Navigator.of(context).pop();
+  //   });
+  // }
 
   //?########### Dialog for add new card ############
   Future showInputDialog() async {
@@ -235,10 +249,10 @@ class _BlogState extends State<Blog> {
                           primary: Colors.limeAccent,
                         ),
                         onPressed: () {
-                          addToDataSet(
-                            titleController.text,
-                            detailController.text,
-                          );
+                          // addToDataSet(
+                          //   titleController.text,
+                          //   detailController.text,
+                          // );
                         },
                         child: Text(
                           'Post',
@@ -258,34 +272,34 @@ class _BlogState extends State<Blog> {
   }
 
   //*########### Add new data from user #############
-  void addToDataSet(String title, String detail) {
-    setState(() {
-      data.add(
-        {'title': title, 'detail': detail},
-      );
-      titleController.clear();
-      detailController.clear();
-      Navigator.of(context).pop();
-    });
-  }
+  // void addToDataSet(String title, String detail) {
+  //   setState(() {
+  //     data.add(
+  //       {'title': title, 'detail': detail},
+  //     );
+  //     titleController.clear();
+  //     detailController.clear();
+  //     Navigator.of(context).pop();
+  //   });
+  // }
 
   //!########### Delete Dialog ##########
-  Future deleteDialog(index) async {
-    await Get.defaultDialog(
-        title: 'Warning',
-        middleText: 'Sure to delete?',
-        textConfirm: 'Yes',
-        textCancel: 'Cancel',
-        confirmTextColor: Colors.white,
-        cancelTextColor: Colors.black,
-        buttonColor: Colors.red,
-        onConfirm: () {
-          setState(() {
-            data.removeAt(index);
-            Get.back();
-          });
-        });
-  }
+  // Future deleteDialog(index) async {
+  //   await Get.defaultDialog(
+  //       title: 'Warning',
+  //       middleText: 'Sure to delete?',
+  //       textConfirm: 'Yes',
+  //       textCancel: 'Cancel',
+  //       confirmTextColor: Colors.white,
+  //       cancelTextColor: Colors.black,
+  //       buttonColor: Colors.red,
+  //       onConfirm: () {
+  //         setState(() {
+  //           data.removeAt(index);
+  //           Get.back();
+  //         });
+  //       });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -326,46 +340,61 @@ class _BlogState extends State<Blog> {
             future: _data,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                List serverData = snapshot.data as List;
-                return Expanded(
-                  child: ListView.builder(
-                    itemCount: serverData.length,
-                    itemBuilder: (context, index) {
-                      return Card(
-                        child: ListTile(
-                          //*----- Edit Button -----*
-                          leading: IconButton(
-                            icon: Icon(Icons.edit),
-                            onPressed: () {
-                              showEditDialog(index);
-                            },
-                          ),
-                          title: Text(serverData[index]['title']),
-                          subtitle: Text('${serverData[index]['detail']}'),
-                          //!----- Delete Button ------!
-                          trailing: IconButton(
-                            onPressed: () {
-                              deleteDialog(index);
-                            },
-                            icon: Icon(
-                              Icons.delete,
-                            ),
-                            
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                List data = snapshot.data as List;
+                return ListView.builder(
+                  itemCount: data.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(data[index]['title']),
+                      subtitle: Text(data[index]['detail']),
+                    );
+                  },
                 );
               } else if (snapshot.hasError) {
-                return Text(
-                  'Error',
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                );
+                return const Text('Error');
               }
-              return CircularProgressIndicator();
+              return const CircularProgressIndicator();
+              // if (snapshot.hasData) {
+              //   List serverData = snapshot.data as List;
+              //   return Expanded(
+              //     child: ListView.builder(
+              //       itemCount: serverData.length,
+              //       itemBuilder: (context, index) {
+              //         return Card(
+              //           child: ListTile(
+              //             //*----- Edit Button -----*
+              //             leading: IconButton(
+              //               icon: Icon(Icons.edit),
+              //               onPressed: () {
+              //                 showEditDialog(index);
+              //               },
+              //             ),
+              //             title: Text(serverData[index]['title']),
+              //             subtitle: Text('${serverData[index]['detail']}'),
+              //             //!----- Delete Button ------!
+              //             trailing: IconButton(
+              //               onPressed: () {
+              //                 deleteDialog(index);
+              //               },
+              //               icon: Icon(
+              //                 Icons.delete,
+              //               ),
+
+              //             ),
+              //           ),
+              //         );
+              //       },
+              //     ),
+              //   );
+              // } else if (snapshot.hasError) {
+              //   return Text(
+              //     'Error',
+              //     style: TextStyle(
+              //       color: Colors.white,
+              //     ),
+              //   );
+              // }
+              // return CircularProgressIndicator();
             },
           ),
         ],
@@ -374,9 +403,10 @@ class _BlogState extends State<Blog> {
   }
 
   Future<void> logout() async {
-    //!Delete token
-    final prefs = await SharedPreferences.getInstance();
-    prefs.remove('token');
-    Get.offNamed('/login');
+    // delete token
+    const storage = FlutterSecureStorage();
+    storage.delete(key: 'token');
+    // return to login
+    Get.off(() => Login());
   }
 }
