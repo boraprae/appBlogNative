@@ -6,6 +6,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:newblog/ToDoAppProject/views/todo_screen.dart';
 import 'package:newblog/blog.dart';
 import 'package:newblog/login.dart';
 import 'package:http/http.dart' as http;
@@ -35,7 +36,7 @@ Future<void> main() async {
       // token is valid
       var result = response.body;
       // print(result['user']);
-      username = result['user'];
+      username = result['user_username'];
       bypass = true;
     } else {
       debugPrint(response.body.toString());
@@ -63,15 +64,26 @@ Future<void> main() async {
   //   print('no token');
   // }
 
+  //! Todo App Project
   runApp(
     GetMaterialApp(
-      initialRoute: bypass ? '/blog' : '/login',
+      initialRoute: '/todo',
       routes: {
-        '/blog': (context) => Blog(username),
-        '/login': (context) => Login(),
+        '/todo': (context) => TodoScreen(),
       },
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamily: 'Sarabun'),
     ),
   );
+  // runApp(
+  //   GetMaterialApp(
+  //     initialRoute: bypass ? '/blog' : '/login',
+  //     routes: {
+  //       '/blog': (context) => Blog(username),
+  //       '/login': (context) => Login(),
+  //     },
+  //     debugShowCheckedModeBanner: false,
+  //     theme: ThemeData(fontFamily: 'Sarabun'),
+  //   ),
+  // );
 }

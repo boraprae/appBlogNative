@@ -1,8 +1,31 @@
-# newblog
+#TODO app Project
 
-A new Flutter project.
+functions
+- display current tasks
+- add new task
+- edit existing task
+- delete existing task
+- toggle status
+- auto save tasks to localstorage
 
-## Getting Started
+MVC
+- Views (UI)
+	- todo screen
+	- add/edit screen
+- Models (Data prototype)
+	- task
+		- title (String)
+		- status (boolean)
+- Controllers (Data + Logic)
+	- Data
+		- all tasks (array/list of task)
+	- Logic
+		- show all tasks
+		- add new task
+		- edit task
+		- delete task
+		- toggle status
+
 
 This project is a starting point for a Flutter application.
 

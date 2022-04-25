@@ -15,11 +15,6 @@ class Blog extends StatefulWidget {
 
 class _BlogState extends State<Blog> {
   //*=========== Data Set ==============
-  // List data = [
-  //   {'title': 'First', 'detail': 'aaa'},
-  //   {'title': 'Second', 'detail': 'bbb'},
-  //   {'title': 'Third', 'detail': 'ccc'},
-  // ];
   TextEditingController titleController = TextEditingController();
   TextEditingController detailController = TextEditingController();
   final maxLines = 5;
@@ -33,11 +28,13 @@ class _BlogState extends State<Blog> {
 
     Response response =
         await GetConnect().get(_url, headers: {'authorization': token});
+    print(response.body);
     if (response.status.isOk) {
       return response.body;
     } else {
       throw Exception('Error');
     }
+
     // Response response = await GetConnect().get(_url);
     // if (response.status.isOk) {
     //   return response.body;
@@ -150,7 +147,7 @@ class _BlogState extends State<Blog> {
   //                       ),
   //                     ),
   //                   ],
-  //                 ),
+  //                 ),                   
   //               ],
   //             ),
   //           ),
@@ -336,68 +333,92 @@ class _BlogState extends State<Blog> {
               label: Text('Add'),
             ),
           ),
-          FutureBuilder(
-            future: _data,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                List data = snapshot.data as List;
-                return ListView.builder(
-                  itemCount: data.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(data[index]['title']),
-                      subtitle: Text(data[index]['detail']),
-                    );
-                  },
-                );
-              } else if (snapshot.hasError) {
-                return const Text('Error');
-              }
-              return const CircularProgressIndicator();
-              // if (snapshot.hasData) {
-              //   List serverData = snapshot.data as List;
-              //   return Expanded(
-              //     child: ListView.builder(
-              //       itemCount: serverData.length,
-              //       itemBuilder: (context, index) {
-              //         return Card(
-              //           child: ListTile(
-              //             //*----- Edit Button -----*
-              //             leading: IconButton(
-              //               icon: Icon(Icons.edit),
-              //               onPressed: () {
-              //                 showEditDialog(index);
-              //               },
-              //             ),
-              //             title: Text(serverData[index]['title']),
-              //             subtitle: Text('${serverData[index]['detail']}'),
-              //             //!----- Delete Button ------!
-              //             trailing: IconButton(
-              //               onPressed: () {
-              //                 deleteDialog(index);
-              //               },
-              //               icon: Icon(
-              //                 Icons.delete,
-              //               ),
+          Expanded(
+            flex: 1,
+            child: FutureBuilder(
+              future: _data,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  List data = snapshot.data as List;
+                  return ListView.builder(
+                    itemCount: data.length,
+                    itemBuilder: (context, index) {
+                      return Card(
+                        child: ListTile(
+                          title: Text(
+                            data[index]['post_title'],
+                          ),
+                          leading: IconButton(
+                            onPressed: () {},
+                            icon: Icon(Icons.edit),
+                          ),
+                          subtitle: Column(
+                            children: [
+                              Text(data[index]['post_detail']),
+                              Text(data[index]['post_datetime']),
+                            ],
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () {},
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                } else if (snapshot.hasError) {
+                  return const Text('Error');
+                }
+                return const CircularProgressIndicator();
+                // if (snapshot.hasData) {
+                //   List serverData = snapshot.data as List;
+                //   return Expanded(
+                //     child: ListView.builder(
+                //       itemCount: serverData.length,
+                //       itemBuilder: (context, index) {
+                //         return Card(
+                //           child: ListTile(
+                //             //*----- Edit Button -----*
+                //             leading: IconButton(
+                //               icon: Icon(Icons.edit),
+                //               onPressed: () {
+                //                 showEditDialog(index);
+                //               },
+                //             ),
+                //             title: Text(serverData[index]['title']),
+                //             subtitle: Text('${serverData[index]['detail']}'),
+                //             //!----- Delete Button ------!
+                //             trailing: IconButton(
+                //               onPressed: () {
+                //                 deleteDialog(index);
+                //               },
+                //               icon: Icon(
+                //                 Icons.delete,
+                //               ),
 
-              //             ),
-              //           ),
-              //         );
-              //       },
-              //     ),
-              //   );
-              // } else if (snapshot.hasError) {
-              //   return Text(
-              //     'Error',
-              //     style: TextStyle(
-              //       color: Colors.white,
-              //     ),
-              //   );
-              // }
-              // return CircularProgressIndicator();
-            },
+                //             ),
+                //           ),
+                //         );
+                //       },
+                //     ),
+                //   );
+                // } else if (snapshot.hasError) {
+                //   return Text(
+                //     'Error',
+                //     style: TextStyle(
+                //       color: Colors.white,
+                //     ),
+                //   );
+                // }
+                // return CircularProgressIndicator();
+              },
+            ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        child: const Icon(Icons.add),
       ),
     );
   }

@@ -19,7 +19,7 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  final url = dotenv.env['SERVER_URL']! + '/login';
+  final url = dotenv.env['SERVER_URL']! + '/mobile/login';
   final formKey = GlobalKey<FormState>();
   // final String login_url = 'http://10.0.2.2:7000/login';
   @override
